@@ -1,0 +1,12 @@
+.row
+  .col.col-lg-4
+    %h1 Pages#home
+    %hr/
+    = link_to "Item", items_path, id: "logo"
+    %hr/
+    %p Find me in app/views/pages/home.html.erb
+    - @items.each do |title|
+      %p
+        = title.label
+  .col-md-auto
+    = react_component("TodoApp", {todoData: @items})
