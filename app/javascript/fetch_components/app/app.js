@@ -1,97 +1,103 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import AppHeader from '../app-header';
-import TodoList from '../todo-list';
-import SearchPanel from '../search-panel';
-import ItemStatusFilter from '../item-status-filter';
-import ItemAddForm from '../item-add-form';
+import AppHeader from "../app-header";
+import TodoList from "../todo-list";
+import SearchPanel from "../search-panel";
+import ItemStatusFilter from "../item-status-filter";
+import ItemAddForm from "../item-add-form";
+import SwapiService from "../../services/swapi-service";
 
-import './app.css';
-
+import "./app.css";
 
 export default class App extends Component {
-
-  maxId = 100;
+  swapiService = new SwapiService();
 
   state = {
-    items: [
-      { id: 1, label: 'Drink Coffee', important: false, done: false },
-      { id: 2, label: 'Learn React', important: true, done: false },
-      { id: 3, label: 'Make Awesome App', important: false, done: false }
-    ],
-    filter: 'all',
-    search: ''
+    items: this.props.items,
+    filter: "all",
+    search: ""
   };
 
-  onItemAdded = (label) => {
-    this.setState((state) => {
-      const item = this.createItem(label);
+  createItem(item) {
+    console.log("ITEM", item.label);
+    return {
+      id: item.id,
+      label: item.label,
+      important: false,
+      done: false
+    };
+  }
+
+  onItemAdded = itemFromForm => {
+    this.setState(state => {
+      const item = this.createItem(itemFromForm);
       return { items: [...state.items, item] };
-    })
+    });
   };
 
   toggleProperty = (arr, id, propName) => {
-    const idx = arr.findIndex((item) => item.id === id);
+    const idx = arr.findIndex(item => item.id === id);
     const oldItem = arr[idx];
     const value = !oldItem[propName];
 
-    const item = { ...arr[idx], [propName]: value } ;
-    return [
-      ...arr.slice(0, idx),
-      item,
-      ...arr.slice(idx + 1)
-    ];
+    const item = { ...arr[idx], [propName]: value };
+    return [...arr.slice(0, idx), item, ...arr.slice(idx + 1)];
   };
 
-  onToggleDone = (id) => {
-    this.setState((state) => {
-      const items = this.toggleProperty(state.items, id, 'done');
+  onToggleDone = id => {
+    this.setState(state => {
+      const items = this.toggleProperty(state.items, id, "done");
       return { items };
     });
   };
 
-  onToggleImportant = (id) => {
-    this.setState((state) => {
-      const items = this.toggleProperty(state.items, id, 'important');
+  onToggleImportant = id => {
+    this.setState(state => {
+      const items = this.toggleProperty(state.items, id, "important");
       return { items };
     });
   };
 
-  onDelete = (id) => {
-    this.setState((state) => {
-      const idx = state.items.findIndex((item) => item.id === id);
+  onDelete = id => {
+    this.swapiService.deleteItem(id, this.onDeleteItemState;
+
+    // this.setState(state => {
+    //   const idx = state.items.findIndex(item => item.id === id);
+    //   const items = [
+    //     ...state.items.slice(0, idx),
+    //     ...state.items.slice(idx + 1)
+    //   ];
+    //   return { items };
+    // });
+  };
+
+  onDeleteItemState(id) {
+    console.log("onDeleteItemState", id);
+    this.setState(state => {
+      const idx = state.items.findIndex(item => item.id === id);
       const items = [
         ...state.items.slice(0, idx),
         ...state.items.slice(idx + 1)
       ];
       return { items };
     });
-  };
+  }
 
-  onFilterChange = (filter) => {
+  onFilterChange = filter => {
     this.setState({ filter });
   };
 
-  onSearchChange = (search) => {
+  onSearchChange = search => {
     this.setState({ search });
   };
 
-  createItem(label) {
-    return {
-      id: ++this.maxId,
-      label,
-      important: false,
-      done: false
-    };
-  }
-
   filterItems(items, filter) {
-    if (filter === 'all') {
+    if (filter === "all") {
       return items;
-    } else if (filter === 'active') {
-      return items.filter((item) => (!item.done));
-    } else if (filter === 'done') {
-      return items.filter((item) => item.done);
+    } else if (filter === "active") {
+      return items.filter(item => !item.done);
+    } else if (filter === "done") {
+      return items.filter(item => item.done);
     }
   }
 
@@ -100,39 +106,44 @@ export default class App extends Component {
       return items;
     }
 
-    return items.filter((item) => {
+    return items.filter(item => {
       return item.label.toLowerCase().indexOf(search.toLowerCase()) > -1;
     });
   }
 
   render() {
     const { items, filter, search } = this.state;
-    const doneCount = items.filter((item) => item.done).length;
+    const doneCount = items.filter(item => item.done).length;
     const toDoCount = items.length - doneCount;
-    const visibleItems = this.searchItems(this.filterItems(items, filter), search);
+    const visibleItems = this.searchItems(
+      this.filterItems(items, filter),
+      search
+    );
+    const iD = items.length != 0 ? items[items.length - 1].id : items.length;
 
+    console.log("Statre", items.length);
     return (
       <div className="todo-app">
-        <AppHeader toDo={toDoCount} done={doneCount}/>
+        <AppHeader toDo={toDoCount} done={doneCount} />
 
         <div className="search-panel d-flex">
-          <SearchPanel
-            onSearchChange={this.onSearchChange}/>
+          <SearchPanel onSearchChange={this.onSearchChange} />
 
           <ItemStatusFilter
             filter={filter}
-            onFilterChange={this.onFilterChange} />
+            onFilterChange={this.onFilterChange}
+          />
         </div>
-
+        {/* {console.log("App", this.props)} */}
         <TodoList
-          items={ visibleItems }
+          items={visibleItems}
           onToggleImportant={this.onToggleImportant}
           onToggleDone={this.onToggleDone}
-          onDelete={this.onDelete} />
+          onDelete={this.onDelete}
+        />
 
-        <ItemAddForm
-          onItemAdded={this.onItemAdded} />
+        <ItemAddForm onItemAdded={this.onItemAdded} iD={iD} />
       </div>
     );
-  };
+  }
 }

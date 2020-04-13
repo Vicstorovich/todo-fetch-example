@@ -3,10 +3,15 @@
     %h1 Pages#home
     %hr/
     = link_to "Item", items_path, id: "logo"
+    = link_to 'Api', api_v1_item_path(43)
     %hr/
     %p Find me in app/views/pages/home.html.erb
     - @items.each do |title|
       %p
+        = title.id
         = title.label
+        = title.done
+        = title.important
   .col-md-auto
-    = react_component("TodoApp", {todoData: @items})
+    = react_component("TodoApp", {items: @items})
+    -# = react_component("ProjectsContainer")
