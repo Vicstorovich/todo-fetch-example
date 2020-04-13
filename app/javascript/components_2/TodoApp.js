@@ -1,5 +1,5 @@
 import React from "react";
-import App from "./app/";
+import App from "./app";
 import SwapiServece from "../services/swapi-service";
 import PropTypes from "prop-types";
 

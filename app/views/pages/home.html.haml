@@ -1,5 +1,5 @@
 .row
-  .col.col-lg-4
+  .col-3
     %h1 Pages#home
     %hr/
     = link_to "Item", items_path, id: "logo"
@@ -13,5 +13,6 @@
         = title.done
         = title.important
   .col-md-auto
+    = react_component("ToDo", {items: @items})
+  .col-5
     = react_component("TodoApp", {items: @items})
-    -# = react_component("ProjectsContainer")
